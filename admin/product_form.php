@@ -58,14 +58,14 @@ $activePage = 'products.php';
               }
             ?>
             <?php if (count($cats) > 0): ?>
-              <select name="category">
+              <select name="category" required>
                 <option value="">-- Select category --</option>
                 <?php foreach ($cats as $cn): ?>
                   <option value="<?=htmlspecialchars($cn)?>" <?= (isset($product['category']) && $product['category']==$cn)?'selected':'' ?>><?=htmlspecialchars($cn)?></option>
                 <?php endforeach; ?>
               </select>
             <?php else: ?>
-              <input name="category" placeholder="Enter category name" value="<?=htmlspecialchars($product['category'] ?? '')?>">
+              <input name="category" required placeholder="Enter category name" value="<?=htmlspecialchars($product['category'] ?? '')?>">
               <div class="muted" style="margin-top:6px">Categories table is missing, so enter the category directly.</div>
             <?php endif; ?>
           </div>
@@ -76,6 +76,10 @@ $activePage = 'products.php';
           <div>
             <label>Discount</label>
             <input name="discount" value="<?=htmlspecialchars($product['discount'] ?? '0.00')?>">
+          </div>
+          <div>
+            <label>Rating</label>
+            <input name="rating" step="0.1" min="0" max="5" value="<?=htmlspecialchars($product['rating'] ?? '0.0')?>">
           </div>
           <div>
             <label>New Category</label>

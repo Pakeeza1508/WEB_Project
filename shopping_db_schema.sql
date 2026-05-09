@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS categories (
 --   - discount: Percentage discount (0-100)
 --   - description: Product details for customers
 --   - rating: Average customer rating (0-5)
+--   - categories: Auto-syncs new category names into the categories table
 -- ============================================================
 CREATE TABLE IF NOT EXISTS shop_products (
   spid INT(11) NOT NULL AUTO_INCREMENT,

@@ -8,7 +8,7 @@ $usersCount = (int) $conn->query('SELECT COUNT(*) AS c FROM users')->fetch_assoc
 $productsCount = (int) $conn->query('SELECT COUNT(*) AS c FROM shop_products')->fetch_assoc()['c'];
 $ordersCount = (int) $conn->query('SELECT COUNT(*) AS c FROM orders')->fetch_assoc()['c'];
 $adminsCount = (int) $conn->query('SELECT COUNT(*) AS c FROM admin_users')->fetch_assoc()['c'];
-$revenue = (float) $conn->query("SELECT IFNULL(SUM(total_amount),0) AS r FROM orders")->fetch_assoc()['r'];
+$revenue = (float) $conn->query("SELECT IFNULL(SUM(total),0) AS r FROM order_items")->fetch_assoc()['r'];
 
 // Recent orders
 $recentOrders = [];

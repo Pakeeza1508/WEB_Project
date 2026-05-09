@@ -25,9 +25,22 @@ $price = floatval($_POST['price'] ?? 0);
 $stock = intval($_POST['stock'] ?? 0);
 $discount = floatval($_POST['discount'] ?? 0.00);
 $description = trim($_POST['description'] ?? '');
+$rating = floatval($_POST['rating'] ?? 0);
 
 if ($name === '') {
     header('Location: product_form.php?error=missing'); exit();
+}
+
+if ($category === '') {
+    header('Location: product_form.php?error=category'); exit();
+}
+
+if ($category !== '') {
+    $catSlug = strtolower(preg_replace('/[^A-Za-z0-9-]+/', '-', $category));
+    $catStmt = $conn->prepare('INSERT INTO categories (name, slug) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name)');
+    $catStmt->bind_param('ss', $category, $catSlug);
+    $catStmt->execute();
+    $catStmt->close();
 }
 
 $imagePath = null;
@@ -37,16 +50,16 @@ if (!empty($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE
 
 if ($spid > 0) {
     if ($imagePath) {
-        $stmt = $conn->prepare('UPDATE shop_products SET name=?, category=?, price=?, stock=?, discount=?, description=?, image=? WHERE spid=?');
-        $stmt->bind_param('ssdidssi', $name, $category, $price, $stock, $discount, $description, $imagePath, $spid);
+        $stmt = $conn->prepare('UPDATE shop_products SET name=?, category=?, price=?, stock=?, discount=?, description=?, rating=?, image=? WHERE spid=?');
+        $stmt->bind_param('ssdidsdsi', $name, $category, $price, $stock, $discount, $description, $rating, $imagePath, $spid);
     } else {
-        $stmt = $conn->prepare('UPDATE shop_products SET name=?, category=?, price=?, stock=?, discount=?, description=? WHERE spid=?');
-        $stmt->bind_param('ssdidsi', $name, $category, $price, $stock, $discount, $description, $spid);
+        $stmt = $conn->prepare('UPDATE shop_products SET name=?, category=?, price=?, stock=?, discount=?, description=?, rating=? WHERE spid=?');
+        $stmt->bind_param('ssdidsdi', $name, $category, $price, $stock, $discount, $description, $rating, $spid);
     }
     $stmt->execute();
 } else {
-    $stmt = $conn->prepare('INSERT INTO shop_products (name, category, price, stock, discount, description, image) VALUES (?, ?, ?, ?, ?, ?, ?)');
-    $stmt->bind_param('ssdidss', $name, $category, $price, $stock, $discount, $description, $imagePath);
+    $stmt = $conn->prepare('INSERT INTO shop_products (name, category, price, stock, discount, description, rating, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+    $stmt->bind_param('ssdidsds', $name, $category, $price, $stock, $discount, $description, $rating, $imagePath);
     $stmt->execute();
 }
 

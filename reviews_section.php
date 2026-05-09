@@ -1,26 +1,39 @@
 <?php
-// 1. PHP LOGIC TO HANDLE SUBMISSION
-if (isset($_POST['submit_review'])) {
-    $uid = $_SESSION['uid'];
-    $rating = $_POST['rating'];
-    $comment = mysqli_real_escape_string($conn, $_POST['comment']);
-
-    $insert_query = "INSERT INTO reviews (userid, spid, rating, comment, is_verified) 
-                     VALUES ('$uid', 0, '$rating', '$comment', 1)";
-    
-    if ($conn->query($insert_query)) {
-        echo "<script>
-                Swal.fire({
-                    title: 'Thank You!',
-                    text: 'Your review has been posted.',
-                    icon: 'success',
-                    confirmButtonColor: '#6366f1'
-                }).then(() => { window.location.href = window.location.pathname; });
-              </script>";
+// 1. FETCH PRODUCTS FOR REVIEW DROPDOWN
+$review_products = [];
+$product_query = "SELECT spid, name FROM shop_products ORDER BY name ASC";
+$product_res = $conn->query($product_query);
+if ($product_res) {
+    while ($row = $product_res->fetch_assoc()) {
+        $review_products[] = $row;
     }
 }
 
-// 2. FETCH REAL REVIEWS FROM DB
+// 2. HANDLE REVIEW SUBMISSION
+if (isset($_POST['submit_review'])) {
+    $uid = (int) ($_SESSION['uid'] ?? 0);
+    $spid = (int) ($_POST['spid'] ?? 0);
+    $rating = (int) ($_POST['rating'] ?? 5);
+    $comment = trim($_POST['comment'] ?? '');
+
+    if ($uid > 0 && $spid > 0 && $comment !== '') {
+        $stmt = $conn->prepare('INSERT INTO reviews (userid, spid, rating, comment, is_verified) VALUES (?, ?, ?, ?, 1)');
+        $stmt->bind_param('iiis', $uid, $spid, $rating, $comment);
+        if ($stmt->execute()) {
+            echo "<script>
+                    Swal.fire({
+                        title: 'Thank You!',
+                        text: 'Your review has been posted.',
+                        icon: 'success',
+                        confirmButtonColor: '#6366f1'
+                    }).then(() => { window.location.href = window.location.pathname; });
+                  </script>";
+        }
+        $stmt->close();
+    }
+}
+
+// 3. FETCH REAL REVIEWS FROM DB
 $real_reviews = [];
 $review_query = "SELECT r.*, u.username 
                  FROM reviews r 
@@ -33,7 +46,7 @@ if($res && $res->num_rows > 0) {
     }
 }
 
-// 3. DUMMY REVIEWS ARRAY (Always visible)
+// 4. DUMMY REVIEWS ARRAY (Always visible)
 $dummy_reviews = [
     [
         "username" => "Sophia Reynolds",
@@ -118,6 +131,15 @@ $display_reviews = array_merge($real_reviews, $dummy_reviews);
         <p style="opacity: 0.6; font-size: 0.9rem; margin-bottom: 20px;">Your feedback helps us improve our luxury experience.</p>
         
         <form method="POST">
+            <div style="margin-bottom: 20px;">
+                <p style="margin-bottom: 8px;">Select Product:</p>
+                <select name="spid" required style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 15px; padding: 15px; color: white; outline: none;">
+                    <option value="">-- Choose a product --</option>
+                    <?php foreach($review_products as $product): ?>
+                        <option value="<?= htmlspecialchars($product['spid']) ?>"><?= htmlspecialchars($product['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
             <input type="hidden" name="rating" id="ratingValue" value="5">
             <div class="rating-input">
                 <p>Your Rating:</p>
