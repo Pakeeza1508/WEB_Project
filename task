@@ -1,0 +1,63 @@
+Next steps (I'll continue when you tell me)
+
+Run the seeder: open http://localhost/webProj/admin/seed_admin.php to create the admin user.
+Then log in at http://localhost/webProj/admin/login.php.
+After you confirm login works, I'll implement product/category CRUD, order management, user management, and UI refinements matching your color scheme.
+Do you want me to proceed with product management next?
+
+GPT-5 mini • 0x
+
+
+
+How to test (quick)
+
+Run the migration once as an admin (after logging in):
+http://localhost/webProj/admin/migrate.php
+Delete migrate.php after success.
+Seed admin (if not done): http://localhost/webProj/admin/seed_admin.php (default admin/admin123). Delete the seeder after use.
+Login: http://localhost/webProj/admin/login.php
+Manage products: http://localhost/webProj/admin/products.php
+Add product images will be saved to products.
+
+Next steps
+
+Run migration: http://localhost/webProj/admin/migrate.php (as admin) — deletes file after success.
+Create a few categories via admin UI: http://localhost/webProj/admin/categories.php
+Then add/edit products; new categories will be used automatically.
+
+How to test
+
+Ensure shop_products.stock exists (run migrate.php if needed).
+Add or edit products so some have stock <= 5.
+Open: http://localhost/webProj/admin/index.php
+
+Test steps
+
+Login as admin.
+Open: http://localhost/webProj/admin/orders.php
+Click an order to view and update status.
+Open invoice and print.
+
+How to test
+
+Run migration: http://localhost/webProj/admin/migrate.php (as admin).
+Open users list: http://localhost/webProj/admin/users.php
+Block/unblock and delete users from the UI.
+
+How to test
+
+Ensure migrations were run (migrate.php) so order_items exists.
+Visit: http://localhost/webProj/admin/reports.php
+
+How to test
+
+Run migration if you changed schema: http://localhost/webProj/admin/migrate.php
+Open: http://localhost/webProj/admin/reviews.php
+Approve, reject, or delete reviews.
+
+
+For the user side, start here:
+http://localhost/webProj/auth.php
+
+For admin, start here:
+http://localhost/webProj/admin/login.php
