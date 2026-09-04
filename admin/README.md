@@ -2,7 +2,12 @@ Admin panel setup
 
 1. Run seed and migrations (one-time):
    - Open in browser: http://localhost/webProj/admin/seed_admin.php
-     - Creates `admin_users` table and a default admin (admin/admin123). Delete this file after use.
+     - Creates `admin_users` table and a default admin.
+     - Development seed credentials:
+       Username: admin
+       Password: admin123
+     - These credentials are intended only for local academic/testing setup.
+     - Re-running the seed script does not reset an existing admin password.
    - Open: http://localhost/webProj/admin/migrate.php
      - Adds columns and tables (`stock`, `discount`, `description`, `categories`, `order_items`, `is_active` on `users`). Delete after success.
 
@@ -20,7 +25,7 @@ Admin panel setup
 4. Assets: shared admin stylesheet is at `admin/assets/css/admin.css`.
 
 Security notes
-- Remove `seed_admin.php` and `migrate.php` after use.
+- Keep the seed and migration scripts available for local development only.
 - Change default admin password after first login.
 
 Support

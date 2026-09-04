@@ -26,16 +26,18 @@ $defaultUser = 'admin';
 $defaultPass = 'admin123';
 $hash = password_hash($defaultPass, PASSWORD_DEFAULT);
 
-$stmt = $conn->prepare('INSERT INTO admin_users (username, email, password, role) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE password = VALUES(password)');
+$stmt = $conn->prepare('INSERT INTO admin_users (username, email, password, role) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE email = VALUES(email), role = VALUES(role)');
 $email = 'admin@example.com';
 $role = 'super';
 $stmt->bind_param('ssss', $defaultUser, $email, $hash, $role);
 $ok = $stmt->execute();
 
 if ($ok) {
-    echo "Admin user created/updated.<br>Username: <strong>$defaultUser</strong><br>Password: <strong>$defaultPass</strong><br>";
+  echo "Development admin seed completed.<br>";
+  echo "Username: <strong>$defaultUser</strong><br>";
+  echo "Default password for first-time setup: <strong>$defaultPass</strong><br>";
+  echo "<strong>Note:</strong> Existing admin passwords are not reset when this script is re-run.<br>";
     echo "<a href=\"login.php\">Go to admin login</a><br>";
-    echo "<strong>Important:</strong> Delete this file after first use for security.";
 } else {
     echo "Error seeding admin user: " . $conn->error;
 }
