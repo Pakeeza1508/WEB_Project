@@ -6,16 +6,17 @@ include "auth_check.php";
 if (isset($_POST['update_qty'])) {
     $cart_id = $_POST['cart_id'];
     $new_qty = (int)$_POST['qty']; // Convert to number for safety
+    $userid = (int)$_SESSION['uid'];
 
     if ($new_qty > 0) {
         // Update the quantity in the database
-        $stmt = $conn->prepare("UPDATE cart SET qty = ? WHERE cart_id = ?");
-        $stmt->bind_param("ii", $new_qty, $cart_id);
+        $stmt = $conn->prepare("UPDATE cart SET qty = ? WHERE cart_id = ? AND userid = ?");
+        $stmt->bind_param("iii", $new_qty, $cart_id, $userid);
         $stmt->execute();
     } else {
         // If qty is 0 or less, just remove the item
-        $stmt = $conn->prepare("DELETE FROM cart WHERE cart_id = ?");
-        $stmt->bind_param("i", $cart_id);
+        $stmt = $conn->prepare("DELETE FROM cart WHERE cart_id = ? AND userid = ?");
+        $stmt->bind_param("ii", $cart_id, $userid);
         $stmt->execute();
     }
     

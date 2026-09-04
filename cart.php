@@ -88,13 +88,13 @@ include "auth_check.php";
                 </td>
                 <td>Rs <?= number_format($row['p_price']) ?></td>
                 <td>
-                    <form action="manage_cart.php" method="POST" style="display: flex; gap: 8px;">
+                    <form class="qty-form" style="display: flex; gap: 8px;">
                         <input type="hidden" name="cart_id" value="<?= $row['cart_id'] ?>">
                         <input type="number" name="qty" value="<?= $row['qty'] ?>" min="1">
-                        <button name="update_qty" class="btn-update"><i class="fa fa-sync"></i></button>
+                        <button type="submit" class="btn-update"><i class="fa fa-sync"></i></button>
                     </form>
                 </td>
-                <td><b style="color:white;">Rs <?= number_format($subtotal) ?></b></td>
+                <td><b id="subtotal-<?= $row['cart_id'] ?>" style="color:white;">Rs <?= number_format($subtotal) ?></b></td>
                 <td>
                     <!-- Uses delete_id which matches manage_cart.php logic -->
                     <a href="manage_cart.php?delete_id=<?= $row['cart_id'] ?>" class="btn-delete" onclick="return confirm('Are you sure you want to remove this item?')">
@@ -114,7 +114,7 @@ include "auth_check.php";
     <?php if($grand_total > 0): ?>
     <div class="cart-summary">
         <p style="opacity: 0.5; margin-bottom: 5px;">Grand Total</p>
-        <div class="grand-total">Rs <?= number_format($grand_total) ?></div>
+        <div class="grand-total" id="grand-total">Rs <?= number_format($grand_total) ?></div>
         <div style="margin: 15px 0; padding: 15px; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); border-radius: 15px; text-align: center;">
     <i class="fa fa-truck" style="color: var(--primary); margin-right: 8px;"></i>
     <span style="font-weight: 600;">Estimated Delivery:</span>
@@ -133,6 +133,48 @@ include "auth_check.php";
     </div>
     <?php endif; ?>
 </div>
+
+<script>
+document.querySelectorAll(".qty-form").forEach(form => {
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const cartId = this.querySelector('[name="cart_id"]').value;
+        const qty = this.querySelector('[name="qty"]').value;
+        const button = this.querySelector("button");
+
+        button.disabled = true;
+
+        try {
+            const response = await fetch("cart_api.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    cart_id: Number(cartId),
+                    qty: Number(qty)
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Cart update failed");
+            }
+
+            document.getElementById(`subtotal-${cartId}`).textContent =
+                `Rs ${Number(data.subtotal).toLocaleString()}`;
+            document.getElementById("grand-total").textContent =
+                `Rs ${Number(data.grand_total).toLocaleString()}`;
+        } catch (error) {
+            alert(error.message);
+        } finally {
+            button.disabled = false;
+        }
+    });
+});
+</script>
 
 </body>
 </html>
